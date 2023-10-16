@@ -20,8 +20,8 @@
     </div>
   </div>
   <div class="row px-5">
-    <div id="editor-container" class="col px-0" style="height:600px;border:1px solid grey"></div>
-    <div id="preview-container" class="col overflow-hidden" style="height:600px;border:1px solid grey"></div>
+    <div id="editor-container" class="w-50 px-0" style="height:600px;border:1px solid grey"></div>
+    <div id="preview-container" class="w-50 overflow-hidden" style="height:600px;border:1px solid grey"></div>
   </div>
 
   <script>
@@ -48,6 +48,7 @@
 
     const defaultCode =
       "# Type sentences\n\n[Recursion](https://recursionist.io)\n\n```\nfunction hello(){\n  return 'hello';\n}\n```"
+
     const editor = monaco.editor.create(editorContainer, {
       value: defaultCode,
       language: 'markdown',
@@ -55,6 +56,7 @@
         enabled: false,
       },
       lineDecorationsWidth: 5,
+      automaticLayout: true
     });
 
     editor.onDidChangeModelContent(() => {
@@ -63,7 +65,6 @@
 
     const renderPreview = () => {
       const editorValue = editor.getValue()
-      // post method
       const data = {
         "markdown": editorValue,
         "highlight": highlight ? "True" : "False"
@@ -76,7 +77,6 @@
         },
         body: JSON.stringify(data)
       }).then((res) => res.json()).then((data) => {
-        console.log(data.html)
         // previewを更新
         if (mode === "preview") {
           previewContainer.innerHTML = data.html
@@ -103,15 +103,40 @@
       }
     })
 
+    const toggleHighlightBtn = () => {
+      highlightBtn.innerText = highlight ? "Highlight: OFF" : "Highlight: ON"
+      highlight = !highlight
+    }
+
     highlightBtn.addEventListener("click", () => {
       toggleHighlightBtn()
       renderPreview()
     })
 
-    const toggleHighlightBtn = () => {
-      highlightBtn.innerText = highlight ? "Highlight: OFF" : "Highlight: ON"
-      highlight = !highlight
-    }
+    downloadBtn.addEventListener("click", () => {
+      const data = {
+        "html": previewContainer.innerHTML
+      }
+
+      fetch("download.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        })
+        .then((res) => res.blob()).then((blob) => {
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement("a")
+          a.href = url
+          a.download = "markdown.html"
+          a.click()
+          window.URL.revokeObjectURL(url)
+        })
+        .catch(error => {
+          console.error('Error:', error)
+        });
+    })
 
     renderPreview()
   </script>
