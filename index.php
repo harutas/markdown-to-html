@@ -13,15 +13,15 @@
   <div class="d-flex justify-content-between mt-2 px-5">
     <h1 class="fs-2 fw-bolder">Markdown to HTML</h1>
     <div class="text-end gap-1">
-      <button id="preview" type="button" class="btn btn-secondary btn-sm">Preview</button>
-      <button id="html-preview" type="button" class="btn btn-secondary btn-sm">HTML</button>
-      <button id="highlight" type="button" class="btn btn-secondary btn-sm">Highlight: ON</button>
-      <button id="download" type="submit" class="btn btn-secondary btn-sm">Download</button>
+      <button id="markdown-preview-btn" type="button" class="btn btn-secondary btn-sm">Preview</button>
+      <button id="html-preview-btn" type="button" class="btn btn-secondary btn-sm">HTML</button>
+      <button id="highlight-btn" type="button" class="btn btn-secondary btn-sm">Highlight: ON</button>
+      <button id="download-btn" type="submit" class="btn btn-secondary btn-sm">Download</button>
     </div>
   </div>
   <div class="row px-5">
     <div id="editor-container" class="col px-0" style="height:600px;border:1px solid grey"></div>
-    <div id="editor-preview" class="col overflow-hidden" style="height:600px;border:1px solid grey"></div>
+    <div id="preview-container" class="col overflow-hidden" style="height:600px;border:1px solid grey"></div>
   </div>
 
   <script>
@@ -35,9 +35,20 @@
   <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
   <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
   <script>
+    let mode = "preview" // preview or html
+    let highlight = true
+
+    const editorContainer = document.getElementById('editor-container')
+    const previewContainer = document.getElementById('preview-container')
+
+    const markdownPreviewBtn = document.getElementById('markdown-preview-btn')
+    const htmlPreviewBtn = document.getElementById('html-preview-btn')
+    const highlightBtn = document.getElementById('highlight-btn')
+    const downloadBtn = document.getElementById('download-btn')
+
     const defaultCode =
-      '# Type sentences\n\n[Recursion](https://recursionist.io)\n\n```\nfunction hello(){\n  return "hello";\n}\n```';
-    const editor = monaco.editor.create(document.getElementById('editor-container'), {
+      "# Type sentences\n\n[Recursion](https://recursionist.io)\n\n```\nfunction hello(){\n  return 'hello';\n}\n```"
+    const editor = monaco.editor.create(editorContainer, {
       value: defaultCode,
       language: 'markdown',
       minimap: {
@@ -45,6 +56,53 @@
       },
       lineDecorationsWidth: 5,
     });
+
+    editor.onDidChangeModelContent(() => {
+      renderPreview()
+    })
+
+    const renderPreview = () => {
+      const editorValue = editor.getValue()
+      // post method
+      const data = {
+        "markdown": editorValue
+      }
+
+      fetch("converter.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }).then((res) => res.json()).then((data) => {
+        console.log(data.html)
+        // previewを更新
+        if (mode === "preview") {
+          previewContainer.innerHTML = data.html
+        } else if (mode === "html") {
+          previewContainer.innerText = data.html
+        }
+
+      }).catch(error => {
+        console.error('Error:', error)
+      });
+    }
+
+    markdownPreviewBtn.addEventListener("click", () => {
+      if (mode !== "preview") {
+        mode = "preview"
+        renderPreview()
+      }
+    })
+
+    htmlPreviewBtn.addEventListener("click", () => {
+      if (mode !== "html") {
+        mode = "html"
+        renderPreview()
+      }
+    })
+
+    renderPreview()
   </script>
 </body>
 
