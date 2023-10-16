@@ -21,7 +21,7 @@
   </div>
   <div class="row px-5">
     <div id="editor-container" class="w-50 px-0" style="height:600px;border:1px solid grey"></div>
-    <div id="preview-container" class="w-50 overflow-hidden" style="height:600px;border:1px solid grey"></div>
+    <div id="preview-container" class="w-50 overflow-auto" style="height:600px;border:1px solid grey"></div>
   </div>
 
   <script>

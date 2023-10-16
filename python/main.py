@@ -11,7 +11,9 @@ def main():
     config = {"codehilite": {"noclasses": ishilite == "True"}}
 
     html = markdown.markdown(
-        markdown_string, extensions=["extra", "codehilite"], extension_configs=config
+        markdown_string,
+        extensions=["extra", "codehilite"],
+        extension_configs=config,
     )
 
     print(html)
