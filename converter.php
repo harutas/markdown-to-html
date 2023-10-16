@@ -24,7 +24,3 @@ if ($post_data) {
   // データが不正な場合の処理
   echo json_encode(array('message' => 'POSTデータが不正です。'));
 }
-
-
-
-// echo $output;
