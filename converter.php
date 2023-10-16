@@ -5,9 +5,10 @@ $post_data = json_decode($data);
 if ($post_data) {
   // markdownを取得
   $markdownString = $post_data->markdown;
+  $isHighlight = $post_data->highlight;
 
 
-  $command = "python python/main.py " . escapeshellarg($markdownString);
+  $command = "python python/main.py " . escapeshellarg($markdownString) . " " . escapeshellarg($isHighlight);
 
   exec($command, $output, $result_code);
 

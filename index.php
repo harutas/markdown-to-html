@@ -65,7 +65,8 @@
       const editorValue = editor.getValue()
       // post method
       const data = {
-        "markdown": editorValue
+        "markdown": editorValue,
+        "highlight": highlight ? "True" : "False"
       }
 
       fetch("converter.php", {
@@ -101,6 +102,16 @@
         renderPreview()
       }
     })
+
+    highlightBtn.addEventListener("click", () => {
+      toggleHighlightBtn()
+      renderPreview()
+    })
+
+    const toggleHighlightBtn = () => {
+      highlightBtn.innerText = highlight ? "Highlight: OFF" : "Highlight: ON"
+      highlight = !highlight
+    }
 
     renderPreview()
   </script>
